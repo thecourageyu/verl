@@ -1,0 +1,65 @@
+# tool_config_path 指向此檔;class_name 需可被 import
+# 執行前:export PYTHONPATH=/path/to/companion_verl/tools:$PYTHONPATH
+tools:
+  - class_name: "tools.companion_tools.MemorySearchTool"
+    config:
+      type: native
+      top_k: 3
+    tool_schema:
+      type: "function"
+      function:
+        name: "search_memory"
+        description: "查詢使用者過去真實保存的記憶(偏好、事件、人物)。只能回報查到的內容;查不到就是沒有。"
+        parameters:
+          type: "object"
+          properties:
+            query:
+              type: "string"
+              description: "要查的關鍵字或短句,例如「主管」「面試」「貓」"
+          required: ["query"]
+
+  - class_name: "tools.companion_tools.ReminderTool"
+    config:
+      type: native
+    tool_schema:
+      type: "function"
+      function:
+        name: "manage_reminder"
+        description: "查詢或建立提醒。建立前必須先 action=list 檢查 pending,且必須在使用者明確同意後才可 user_confirmed=true。"
+        parameters:
+          type: "object"
+          properties:
+            action:
+              type: "string"
+              enum: ["list", "create"]
+              description: "list=查 pending;create=建立提醒"
+            time:
+              type: "string"
+              description: "提醒時間,例如 2026-10-30 09:00"
+            content:
+              type: "string"
+              description: "提醒內容"
+            user_confirmed:
+              type: "boolean"
+              description: "使用者是否已明確同意建立(未明確同意請不要 create)"
+          required: ["action"]
+  
+  - class_name: "tools.companion_tools.Memory"
+    config:
+      type: native
+      top_k: 3
+    tool_schema:
+      type: "function"
+      function:
+        name: "memory"
+        description: "依用戶需求調整記憶，包含 create, ignore, read, update, forget 等操作"
+        parameters:
+          type: "object"
+          properties:
+            operation: 
+              type: "string"
+              description: "用戶想要進行的操作類型，即 create, ignore, read, update 或 forget"
+            query:
+              type: "string"
+              description: "用戶的請求"
+          required: ["operation", "query"]
